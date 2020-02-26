@@ -1,0 +1,33 @@
+﻿@page
+@model Article.Areas.Admin.Pages.IndexModel
+@{
+    var article = ViewData["articles"] as List<Article.Model.Articles>;
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+        <th scope="col">No</th>
+        <th scope="col">Title</th>
+        <th scope="col">Status</th>
+        <th scope="col">Option</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int i = 1;}
+        @foreach (var item in article)
+        {
+            <tr>
+            <th scope="row">@i</th>
+            <td>@item.Titile</td>
+            <td>@item.Status</td>
+            <td>
+                <button class="btn btn-warning" onclick="window.location.href = '/admin/create?edit=@item.id';">Edit</button>
+                <button class="btn btn-danger" onclick="window.location.href = '/admin?delete=@item.id';">Delete</button>
+            </td>
+            </tr>
+            i++;
+        }
+        
+    </tbody>
+</table>
