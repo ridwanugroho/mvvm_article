@@ -11,6 +11,7 @@ namespace Article.Data
     public class ApplicationDbContext : IdentityDbContext
     {
         public DbSet<Articles> article{get; set;}
+        public DbSet<Comments> comment{get; set;}
         
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
