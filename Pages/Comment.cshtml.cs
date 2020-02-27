@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,47 +16,32 @@ using Article.Data;
 
 namespace Article.Pages
 {
-    public class IndexModel : PageModel
+    [Authorize(Roles="user")]
+    public class CommentModel : PageModel
     {
         private ApplicationDbContext _db;
 
-        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<CommentModel> _logger;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public IndexModel(ILogger<IndexModel> logger, ApplicationDbContext db,
-                        UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private RoleManager<IdentityRole> _roleManager;
+
+        public CommentModel(ILogger<CommentModel> logger, ApplicationDbContext db,
+                        UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, 
+                        RoleManager<IdentityRole> roleManager)
         {
             _db = db;
             _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
 
         public void OnGet()
         {
-            var task = GetArticles();
-            task.Wait();
-
-            ViewData["articles"] = task.Result;
         }
-
-        private async Task<List<Articles>> GetArticles()
-        {
-            var articles = (from a in _db.article select a).ToList();
-            
-            for (int i=0; i<articles.Count; i++)
-            {
-                var user = await _userManager.FindByIdAsync(articles[i].Owner);
-                
-                // articles[i].Owner = user.UserName;
-            }
-
-            return articles;
-        }
-
-//{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{Comment handler}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
         public IActionResult OnGetComment(string id)
         {
@@ -66,27 +51,20 @@ namespace Article.Pages
             return new OkObjectResult(comments);
         }
 
-        [Authorize(Roles="user")]
         public IActionResult OnGetSubmitComment(string id, string comment)
         {
-            if(validateUser(_userManager.GetUserId(User), "user"))
+            var commentToSend = new Comments()
             {
-                var commentToSend = new Comments()
-                {
-                    Sender = _userManager.GetUserId(User),
-                    ArticleId = id,
-                    Content = comment,
-                    Created_at = DateTime.Now
-                };
+                Sender = _userManager.GetUserId(User),
+                ArticleId = id,
+                Content = comment,
+                Created_at = DateTime.Now
+            };
 
-                _db.comment.Add(commentToSend);
-                _db.SaveChanges();
+            _db.comment.Add(commentToSend);
+            _db.SaveChanges();
 
-                return new OkObjectResult(commentToSend);
-            }
-
-            else
-                return new OkObjectResult(new Comments(){});
+            return new OkObjectResult(commentToSend);
         }
 
         private bool validateUser(string id, string role)

@@ -17,11 +17,10 @@
         {
             <tr>
                 <td>
-                    <h2>@item.Titile</h2>
+                    <h2 id="title-@item.id" onclick="javascript: articleDetail(this)">@item.Titile</h2>
                     Author : @item.Owner <br>
-                    @item.Content <br><br>
-                    <div id="comment-bar-@item.id">
-                        <a class="btn cmnt-btn" id="@item.id" onclick="javascript: openComment(this)">Comments</a>
+                    <div class="art-content-div">
+                        @item.Content <br><br>
                     </div>
                 </td>
             </tr>
@@ -37,33 +36,10 @@
 @section Scripts
 {
 <script type="text/javascript">
-function openComment(ID)
-{
-    let id = ID.id;
+function articleDetail(ID){
+    var id = ID.id.substring(6, ID.id.length);
 
-    console.log(id);
-    let commentBarID = '#comment-bar-' + id;
-    console.log(commentBarID);
-    $(commentBarID).empty();
-
-    console.log("generate comments");
-
-    console.log("append all comments");
-
-    console.log("generate comment input form");
-    var inputComment = '<div class="input-group mb-3">' +
-                       '<input  id="comment-' + id + ' type="text" class="form-control" aria-label="Recipient username" aria-describedby="basic-addon2">'+
-                       '<div class="input-group-append">' +
-                       '<button id="submit-' + id + ' class="btn btn-outline-secondary" type="button">Button</button></div></div>';
-
-    $(commentBarID).append(inputComment);
-    
-    //var commentForm = '<input type="text"  id="comment-' + id + '">';
-    //var submitBtn = '<button id="submit-' + id + '">Submit comment</button>'
-    //$(commentBarID).append(commentForm);
-    //$(commentBarID).append(submitBtn);
-
-
+    window.location.href = '/ArticleDetail?id=' + id;
 }
 </script>
 }

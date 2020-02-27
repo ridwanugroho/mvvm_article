@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,15 +16,15 @@ using Article.Data;
 
 namespace Article.Pages
 {
-    public class IndexModel : PageModel
+    public class ArticleDetailModel : PageModel
     {
         private ApplicationDbContext _db;
 
-        private readonly ILogger<IndexModel> _logger;
+        private readonly ILogger<ArticleDetailModel> _logger;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
 
-        public IndexModel(ILogger<IndexModel> logger, ApplicationDbContext db,
+        public ArticleDetailModel(ILogger<ArticleDetailModel> logger, ApplicationDbContext db,
                         UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
         {
             _db = db;
@@ -34,26 +34,11 @@ namespace Article.Pages
         }
 
 
-        public void OnGet()
+        public void OnGet(string id)
         {
-            var task = GetArticles();
-            task.Wait();
+            var article = _db.article.Find(Guid.Parse(id));
 
-            ViewData["articles"] = task.Result;
-        }
-
-        private async Task<List<Articles>> GetArticles()
-        {
-            var articles = (from a in _db.article select a).ToList();
-            
-            for (int i=0; i<articles.Count; i++)
-            {
-                var user = await _userManager.FindByIdAsync(articles[i].Owner);
-                
-                // articles[i].Owner = user.UserName;
-            }
-
-            return articles;
+            ViewData["article"] = article;
         }
 
 //{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{Comment handler}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}

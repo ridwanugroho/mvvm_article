@@ -97,3 +97,10 @@ body {
 .cmnt-btn {
   color: #1b6ec2;
 }
+
+.art-content-div {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 1110px;
+}

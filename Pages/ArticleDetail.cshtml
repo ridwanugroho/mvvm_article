@@ -1,0 +1,105 @@
+@page
+@model ArticleDetailModel
+@{
+    ViewData["Title"] = "Home page";
+    var article = ViewData["article"] as Article.Model.Articles;
+}
+
+<div class="text-center">
+    <h1 class="display-4">@article.Titile</h1>
+    <br>
+</div>
+
+Author : @article.Owner <br>
+<div>
+    @article.Content <br><br>
+</div>
+<div id="comment-bar-@article.id">
+    <div id="comment-btn-@article.id">
+        <a class="btn cmnt-btn" id="@article.id" onclick="javascript: openComment(this)">Comments</a>
+    </div>
+    <div id="comment-content-@article.id">
+
+    </div>
+    <div id="comment-input-@article.id">
+
+    </div>
+</div>
+
+
+
+
+
+
+
+@section Scripts
+{
+<script type="text/javascript">
+function openComment(ID){
+    let id = ID.id;
+
+    console.log(id);
+    let commentInput = '#comment-input-' + id;
+    console.log(commentInput);
+
+    var commentBtn = '#comment-btn-' + id;
+    $(commentBtn).empty();
+
+    console.log("generate comments");
+    var commentUrl = '/ArticleDetail?handler=Comment&id=' + id;
+    $.get(commentUrl, function(data){
+        console.log(data);
+        var comments = '';
+        var commentContent = '#comment-content-' + id;
+
+        for(i=0; i<data.length; i++){
+           var from = '<span>'+ data[i].sender + '</span><br>';
+            var content = '<span>'+ data[i].content + '</span><br><br>';
+            $(commentContent).append(from + content);
+        }
+
+
+    }).catch(function(err){
+        console.log(err);
+    });
+
+    console.log("append all comments");
+
+    console.log("generate comment input form");
+    var inputComment = '<div class="input-group mb-3">' +
+                       '<input  id="comment-' + id + '" type="text" class="form-control" aria-label="Recipient username" aria-describedby="basic-addon2">'+
+                       '<div class="input-group-append">' +
+                       '<button id="submit-' + id + '" class="btn btn-outline-secondary" type="button" onclick="javascript: sendComment(this)">Send</button></div></div>';
+
+    $(commentInput).append(inputComment);
+}
+
+function sendComment(ID){
+    let id = ID.id.substring(7, ID.id.length);
+    var inputId = '#comment-' + id;
+    var commentContent = $(inputId).val();
+    var commentUrl = '/ArticleDetail?handler=SubmitComment&id='+ id + '&comment=' + commentContent;
+    console.log(commentUrl);
+
+    $.get(commentUrl, function(data){
+        console.log(data);
+        $(inputId).val('');
+
+        if(data.content != undefined){
+            var commentContent = '#comment-content-'+ id;
+            var content = '<span>'+data.content+'</span>';
+            $(commentContent).append(content);
+        }
+
+        else{
+            throw err;
+        }
+
+    }).catch(function(err){
+        console.log(err);
+        var content = '<span>Anda tidak boleh komentar!</span>';
+        $(commentContent).append(content);
+    });
+}
+</script>
+}
