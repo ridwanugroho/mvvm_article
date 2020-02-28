@@ -4,43 +4,22 @@ using Article.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Article.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200228020807_resolve-migrations")]
+    partial class resolvemigrations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Article.Model.AppFile", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ArticleID")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Created_at")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("Edited_at")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("File");
-                });
 
             modelBuilder.Entity("Article.Model.Articles", b =>
                 {

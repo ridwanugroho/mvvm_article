@@ -35,14 +35,39 @@ namespace Article.Pages
             _roleManager = roleManager;
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGet()
         {
-            
+            ViewData["usersAndRoles"] = await getAllUserRole();
+
+            return Page();
         }
 
         public void OnPost()
         {
+        }
 
+        private async Task<List<UserRoleDetail>> getAllUserRole()
+        {
+            var user = from u in _userManager.Users select u;
+            
+            var list = new List<UserRoleDetail>();
+
+            foreach(var u in user)
+            {
+                var role = await _userManager.GetRolesAsync(u);
+                var _role = "null";
+                if(role.Count() > 0)
+                    _role = role.First();
+
+                list.Add(new UserRoleDetail
+                {
+                    UserId = u.Id,
+                    Username = u.UserName,
+                    role = _role
+                });
+            }
+
+            return list;
         }
 
         public async Task<IActionResult> OnGetCreateRole(string role)
@@ -62,12 +87,23 @@ namespace Article.Pages
 
         public async Task<IActionResult> OnGetSetRole(string userId, string role)
         {
+
             var user = await _userManager.FindByIdAsync(userId);
             IdentityResult result = await _userManager.AddToRoleAsync(user, role);
             if(!result.Succeeded)
                 return Content("Bad");
 
-            return Content("Ok");
+            return Redirect("/RoleManager");
+        }
+
+        public async Task<IActionResult> removeFromPrevRole(string userId, string role)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            IdentityResult result = await _userManager.RemoveFromRoleAsync(user, role);
+            if(!result.Succeeded)
+                return Content("Bad");
+
+            return Redirect("/RoleManager");
         }
     }
 }

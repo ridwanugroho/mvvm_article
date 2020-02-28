@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 
 using Article.Data;
 using Article.Model;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace Article.Areas.Admin.Pages
 {
@@ -19,6 +21,9 @@ namespace Article.Areas.Admin.Pages
         private readonly ILogger<CreateModel> _logger;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        
+        [BindProperty]
+        public BufferedSingleFileUploadDb FileUpload { get; set; }
 
         public CreateModel(ILogger<CreateModel> logger, ApplicationDbContext db,
                         UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
@@ -41,12 +46,24 @@ namespace Article.Areas.Admin.Pages
                 ViewData["articleId"] = "0";
         }
 
-        public IActionResult OnPost(string title, string content, string edit, string status)
+        public async Task<IActionResult> OnPost(string title, string content, string edit, string status, [FromForm(Name="files")] IFormFile files)
         {
             Console.WriteLine(title);
             Console.WriteLine(content);
             Console.WriteLine(edit);
             Console.WriteLine(status);
+
+            var path = "wwwroot\\Images";
+            var filename = Path.Combine(path, Path.GetRandomFileName());
+            Directory.CreateDirectory(path);
+            if(files != null)
+            {
+                using(var stream = new FileStream(filename, FileMode.Create))
+                {
+                    await files.CopyToAsync(stream);
+                }
+            }
+
 
             if(IndexModel.validateStr(edit))
             {
@@ -56,23 +73,29 @@ namespace Article.Areas.Admin.Pages
 
             else
             {
-                createArticle(title, content);
+                createArticle(title, content, status, filename);
                 Console.WriteLine("saving new article .. .");
             }
+
 
             return RedirectToPage("/SubmitConfirmation");
         }
 
-        private void createArticle(string title, string content)
+        private void createArticle(string title, string content, string status, string filename)
         {
+            var _status = "publish";
+            if(validateStr(status))
+                _status = "draft";
+
             var article  = new Articles()
             {
                 Owner = _userManager.GetUserId(User),
                 Titile = title,
                 Content = content,
                 Rating = 10,
-                Status = "publish",
+                Status = _status,
                 Created_at = DateTime.Now,
+                Image = filename
             };
 
             _db.article.Add(article);
@@ -89,5 +112,22 @@ namespace Article.Areas.Admin.Pages
 
             _db.SaveChanges();
         }
+
+        public static bool validateStr(string str)
+        {
+            if(string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str))
+                return false;
+
+            else
+                return true;
+        }
+    }
+
+
+    public class BufferedSingleFileUploadDb
+    {
+        // [Required]
+        // [Display(Name="File")]
+        public IFormFile FormFile { get; set; }
     }
 }

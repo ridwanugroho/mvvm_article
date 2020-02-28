@@ -13,5 +13,6 @@ namespace Article.Model
         public DateTime Created_at{get; set;}
         public DateTime Edited_at{get; set;}
         public DateTime Deleted_at{get; set;}
+        public string Image{get; set;}
     }
 }

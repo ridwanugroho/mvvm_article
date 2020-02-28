@@ -1,4 +1,63 @@
 @page
 @model RoleManagerModel
 
-okeoeks
+@{
+    var userdAndRoles = ViewData["usersAndRoles"] as List<Article.Model.UserRoleDetail>;
+}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">No</th>
+      <th scope="col">User</th>
+      <th scope="col">Role</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+      @{int i = 1;}
+      @foreach (var u in userdAndRoles)
+      {
+        <tr>
+        <th scope="row">@i</th>
+        <td>@u.Username (@u.role)</td>
+        <td>
+            <select class="form-control" id="role-@u.UserId">
+                @if(u.role == "admin"){
+                    <option selected value="admin">admin</option>
+                    <option value="user">user</option>
+                }
+                else if(u.role == "user"){
+                    <option value="admin">admin</option>
+                    <option selected value="user">user</option>
+                }
+                else{
+                    <option>Selecr role</option>
+                    <option value="admin">admin</option>
+                    <option value="user">user</option>
+                }
+            </select>
+        </td>
+        <td>
+            <button id="btn-@u.UserId" class="btn btn-primary" onclick="javascript: setRole(this)">Set</button>
+        </td>
+        </tr>
+        i++;
+      }
+  </tbody>
+</table>
+
+@section Scripts
+{
+<script type="text/javascript">
+function setRole(ID){
+    var id = ID.id.substring(4, ID.id.length);
+    var roleSelect = '#role-' + id;
+    console.log(roleSelect);
+    var role = $(roleSelect).val()
+    var url = '/RoleManager?handler=SetRole&userId='+ id + '&role=' + role;
+    console.log(url);
+    window.location.href = url;
+}
+</script>
+}

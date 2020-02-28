@@ -4,14 +4,16 @@ using Article.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Article.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200228085513_add-file-image-table")]
+    partial class addfileimagetable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,17 +27,14 @@ namespace Article.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ArticleID")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Created_at")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Edited_at")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("id");
 

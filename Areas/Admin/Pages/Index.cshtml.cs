@@ -29,26 +29,21 @@ namespace Article.Areas.Admin.Pages
             _signInManager = signInManager;
         }
 
-        public void OnGet(string delete)
+        public void OnGet(string view)
         {
             var articles = GetArticles(_userManager.GetUserId(User));
+
             ViewData["articles"] = articles;
-
-            foreach(var a in articles)
-                Console.WriteLine(a.Titile);
-
-            if(validateStr(delete))
-            {
-                deleteArticle(delete);
-            }
         }
 
-        private void deleteArticle(string deleteId)
+        public IActionResult OnGetDeleteArticle(string delete)
         {
-            var deleteArticle = _db.article.Find(Guid.Parse(deleteId));
+            var deleteArticle = _db.article.Find(Guid.Parse(delete));
             deleteArticle.Status = "deleted";
             deleteArticle.Deleted_at = DateTime.Now;
             _db.SaveChanges();
+
+            return Redirect("/admin");
         }
 
         private List<Articles> GetArticles(string ownerId)
@@ -57,6 +52,50 @@ namespace Article.Areas.Admin.Pages
             var articles = (from a in _db.article where a.Owner == ownerId select a).ToList();
 
             return articles;
+        }
+
+        public IActionResult OnGetPublished()
+        {
+            var articles = GetArticles(_userManager.GetUserId(User));
+            ViewData["articles"] = (from a in articles where a.Status == "publish" select a).ToList();
+
+            return Page();
+        }
+
+        public IActionResult OnGetDraft()
+        {
+            var articles = GetArticles(_userManager.GetUserId(User));
+            ViewData["articles"] = (from a in articles where a.Status == "draft" select a).ToList();
+
+            return Page();
+        }
+
+        public IActionResult OnGetDeleted()
+        {
+            var articles = GetArticles(_userManager.GetUserId(User));
+            ViewData["articles"] = (from a in articles where a.Status == "deleted" select a).ToList();
+
+            return Page();
+        }
+
+        public IActionResult OnGetRestore(string id)
+        {
+            var article = _db.article.Find(Guid.Parse(id));
+            article.Status = "draft";
+
+            _db.SaveChanges();
+
+            return Redirect("/admin/index?handler=deleted");
+        }
+
+        public IActionResult OnGetPublish(string id)
+        {
+            var article = _db.article.Find(Guid.Parse(id));
+            article.Status = "publish";
+
+            _db.SaveChanges();
+
+            return Redirect("/admin/index?handler=draft");
         }
 
         public static bool validateStr(string str)

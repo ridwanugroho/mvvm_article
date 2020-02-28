@@ -46,6 +46,17 @@ namespace Article
 
                     options.ClientId = googleAuthNSection["ClientId"];
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
+                })
+                .AddMicrosoftAccount(microsoftOptions =>
+                {
+                    microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ClientId"];
+                    microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                })
+                .AddTwitter(twitterOptions =>
+                {
+                    twitterOptions.ConsumerKey = Configuration["Authentication:Twitter:ConsumerAPIKey"];
+                    twitterOptions.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
+                    twitterOptions.RetrieveUserDetails = true;
                 });
 
             services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)

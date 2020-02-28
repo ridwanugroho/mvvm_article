@@ -104,3 +104,7 @@ body {
   text-overflow: ellipsis;
   max-width: 1110px;
 }
+
+.admin-menu{
+  color: #fff;
+}

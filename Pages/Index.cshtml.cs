@@ -36,9 +36,9 @@ namespace Article.Pages
 
         public IActionResult OnGet()
         {
-            if(validateUser(_userManager.GetUserId(User), "admin"))
+            if(User.IsInRole("admin"))
             {
-                return Redirect("/admin/article");
+                return Redirect("/admin");
             }
 
             var task = GetArticles();
@@ -61,37 +61,6 @@ namespace Article.Pages
             }
 
             return articles;
-        }
-
-        private bool validateUser(string id, string role)
-        {
-            var emptyUser = "00000000-0000-0000-0000-000000000000";
-            
-            if(id == emptyUser || string.IsNullOrEmpty(id))
-                return false;
-            
-            var user = (from r in _db.role where r.UserId == id select r).First();
-
-            switch (role)
-            {
-                case "user":
-                if(user.Role == 1)
-                    return true;
-                break;
-
-                case "author":
-                if(user.Role == 2)
-                    return true;
-                break;
-
-                case "admin":
-                if(user.Role == 3)
-                    return true;
-                break;
-            }
-
-            return false;
-
         }
     }
 }
