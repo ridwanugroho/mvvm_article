@@ -63,39 +63,6 @@ namespace Article.Pages
             return articles;
         }
 
-//{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{Comment handler}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-        public IActionResult OnGetComment(string id)
-        {
-            Console.WriteLine("get all comment from {0}", id);
-            var comments = (from c in _db.comment where c.ArticleId == id select c).ToList();
-            
-            return new OkObjectResult(comments);
-        }
-
-        [Authorize(Roles="user")]
-        public IActionResult OnGetSubmitComment(string id, string comment)
-        {
-            if(validateUser(_userManager.GetUserId(User), "user"))
-            {
-                var commentToSend = new Comments()
-                {
-                    Sender = _userManager.GetUserId(User),
-                    ArticleId = id,
-                    Content = comment,
-                    Created_at = DateTime.Now
-                };
-
-                _db.comment.Add(commentToSend);
-                _db.SaveChanges();
-
-                return new OkObjectResult(commentToSend);
-            }
-
-            else
-                return new OkObjectResult(new Comments(){});
-        }
-
         private bool validateUser(string id, string role)
         {
             var emptyUser = "00000000-0000-0000-0000-000000000000";
