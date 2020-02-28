@@ -34,12 +34,19 @@ namespace Article.Pages
         }
 
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            if(validateUser(_userManager.GetUserId(User), "admin"))
+            {
+                return Redirect("/admin/article");
+            }
+
             var task = GetArticles();
             task.Wait();
 
             ViewData["articles"] = task.Result;
+
+            return Page();
         }
 
         private async Task<List<Articles>> GetArticles()
@@ -93,7 +100,7 @@ namespace Article.Pages
         {
             var emptyUser = "00000000-0000-0000-0000-000000000000";
             
-            if(id == emptyUser)
+            if(id == emptyUser || string.IsNullOrEmpty(id))
                 return false;
             
             var user = (from r in _db.role where r.UserId == id select r).First();
